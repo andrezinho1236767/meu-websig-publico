@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="data/Logradouros_1.js"></script>
+        <script src="data/Logradouros_2.js"></script>
+        <script src="data/Logradouros_3.js"></script>
+        <script src="data/localidades_4.js"></script>
+        <script src="data/localidades_5.js"></script>
+        <script src="data/localidades_6.js"></script>
+        <script src="data/reasdeesporteelazernomunicpiodeRioGrandePgina1_7.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-32.31521236843641,-52.62171947352506],[-31.840036454844153,-51.77169402916366]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleSatellite_0;
+        map.addLayer(layer_GoogleSatellite_0);
+        function pop_Logradouros_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Id'] !== null ? autolinker.link(String(feature.properties['Id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STRING'] !== null ? autolinker.link(String(feature.properties['STRING']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Solo'] !== null ? autolinker.link(String(feature.properties['Solo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POPULAR'] !== null ? autolinker.link(String(feature.properties['POPULAR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Logradouros_1_0() {
+            return {
+                pane: 'pane_Logradouros_1',
+                opacity: 1,
+                color: 'rgba(225,89,137,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Logradouros_1');
+        map.getPane('pane_Logradouros_1').style.zIndex = 401;
+        map.getPane('pane_Logradouros_1').style['mix-blend-mode'] = 'normal';
+        var layer_Logradouros_1 = new L.geoJson(json_Logradouros_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Logradouros_1',
+            layerName: 'layer_Logradouros_1',
+            pane: 'pane_Logradouros_1',
+            onEachFeature: pop_Logradouros_1,
+            style: style_Logradouros_1_0,
+        });
+        bounds_group.addLayer(layer_Logradouros_1);
+        map.addLayer(layer_Logradouros_1);
+        function pop_Logradouros_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Id'] !== null ? autolinker.link(String(feature.properties['Id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STRING'] !== null ? autolinker.link(String(feature.properties['STRING']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Solo'] !== null ? autolinker.link(String(feature.properties['Solo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POPULAR'] !== null ? autolinker.link(String(feature.properties['POPULAR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Logradouros_2_0() {
+            return {
+                pane: 'pane_Logradouros_2',
+                opacity: 1,
+                color: 'rgba(152,125,183,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Logradouros_2');
+        map.getPane('pane_Logradouros_2').style.zIndex = 402;
+        map.getPane('pane_Logradouros_2').style['mix-blend-mode'] = 'normal';
+        var layer_Logradouros_2 = new L.geoJson(json_Logradouros_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Logradouros_2',
+            layerName: 'layer_Logradouros_2',
+            pane: 'pane_Logradouros_2',
+            onEachFeature: pop_Logradouros_2,
+            style: style_Logradouros_2_0,
+        });
+        bounds_group.addLayer(layer_Logradouros_2);
+        map.addLayer(layer_Logradouros_2);
+        function pop_Logradouros_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Id'] !== null ? autolinker.link(String(feature.properties['Id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['STRING'] !== null ? autolinker.link(String(feature.properties['STRING']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Solo'] !== null ? autolinker.link(String(feature.properties['Solo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POPULAR'] !== null ? autolinker.link(String(feature.properties['POPULAR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Logradouros_3_0() {
+            return {
+                pane: 'pane_Logradouros_3',
+                opacity: 1,
+                color: 'rgba(255,158,23,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Logradouros_3');
+        map.getPane('pane_Logradouros_3').style.zIndex = 403;
+        map.getPane('pane_Logradouros_3').style['mix-blend-mode'] = 'normal';
+        var layer_Logradouros_3 = new L.geoJson(json_Logradouros_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Logradouros_3',
+            layerName: 'layer_Logradouros_3',
+            pane: 'pane_Logradouros_3',
+            onEachFeature: pop_Logradouros_3,
+            style: style_Logradouros_3_0,
+        });
+        bounds_group.addLayer(layer_Logradouros_3);
+        map.addLayer(layer_Logradouros_3);
+        function pop_localidades_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO'] !== null ? autolinker.link(String(feature.properties['TIPO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Bairros'] !== null ? autolinker.link(String(feature.properties['Bairros']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Servicos'] !== null ? autolinker.link(String(feature.properties['Servicos']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['educacao'] !== null ? autolinker.link(String(feature.properties['educacao']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['saude'] !== null ? autolinker.link(String(feature.properties['saude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CRAS'] !== null ? autolinker.link(String(feature.properties['CRAS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_localidades_4_0() {
+            return {
+                pane: 'pane_localidades_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(243,166,178,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_localidades_4');
+        map.getPane('pane_localidades_4').style.zIndex = 404;
+        map.getPane('pane_localidades_4').style['mix-blend-mode'] = 'normal';
+        var layer_localidades_4 = new L.geoJson(json_localidades_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_localidades_4',
+            layerName: 'layer_localidades_4',
+            pane: 'pane_localidades_4',
+            onEachFeature: pop_localidades_4,
+            style: style_localidades_4_0,
+        });
+        bounds_group.addLayer(layer_localidades_4);
+        map.addLayer(layer_localidades_4);
+        function pop_localidades_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO'] !== null ? autolinker.link(String(feature.properties['TIPO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Bairros'] !== null ? autolinker.link(String(feature.properties['Bairros']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Servicos'] !== null ? autolinker.link(String(feature.properties['Servicos']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['educacao'] !== null ? autolinker.link(String(feature.properties['educacao']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['saude'] !== null ? autolinker.link(String(feature.properties['saude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CRAS'] !== null ? autolinker.link(String(feature.properties['CRAS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_localidades_5_0() {
+            return {
+                pane: 'pane_localidades_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(164,113,88,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_localidades_5');
+        map.getPane('pane_localidades_5').style.zIndex = 405;
+        map.getPane('pane_localidades_5').style['mix-blend-mode'] = 'normal';
+        var layer_localidades_5 = new L.geoJson(json_localidades_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_localidades_5',
+            layerName: 'layer_localidades_5',
+            pane: 'pane_localidades_5',
+            onEachFeature: pop_localidades_5,
+            style: style_localidades_5_0,
+        });
+        bounds_group.addLayer(layer_localidades_5);
+        map.addLayer(layer_localidades_5);
+        function pop_localidades_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO'] !== null ? autolinker.link(String(feature.properties['TIPO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Bairros'] !== null ? autolinker.link(String(feature.properties['Bairros']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Servicos'] !== null ? autolinker.link(String(feature.properties['Servicos']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['educacao'] !== null ? autolinker.link(String(feature.properties['educacao']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['saude'] !== null ? autolinker.link(String(feature.properties['saude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CRAS'] !== null ? autolinker.link(String(feature.properties['CRAS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_localidades_6_0() {
+            return {
+                pane: 'pane_localidades_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(145,145,145,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_localidades_6');
+        map.getPane('pane_localidades_6').style.zIndex = 406;
+        map.getPane('pane_localidades_6').style['mix-blend-mode'] = 'normal';
+        var layer_localidades_6 = new L.geoJson(json_localidades_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_localidades_6',
+            layerName: 'layer_localidades_6',
+            pane: 'pane_localidades_6',
+            onEachFeature: pop_localidades_6,
+            style: style_localidades_6_0,
+        });
+        bounds_group.addLayer(layer_localidades_6);
+        map.addLayer(layer_localidades_6);
+        function pop_reasdeesporteelazernomunicpiodeRioGrandePgina1_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nome:'] !== null ? autolinker.link(String(feature.properties['Nome:']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Longitude'] !== null ? autolinker.link(String(feature.properties['Longitude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Latitude'] !== null ? autolinker.link(String(feature.properties['Latitude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Descrição de Equipamentos:'] !== null ? autolinker.link(String(feature.properties['Descrição de Equipamentos:']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Endereço:'] !== null ? autolinker.link(String(feature.properties['Endereço:']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tipo:'] !== null ? autolinker.link(String(feature.properties['Tipo:']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Observações:'] !== null ? autolinker.link(String(feature.properties['Observações:']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_reasdeesporteelazernomunicpiodeRioGrandePgina1_7_0(feature) {
+            switch(String(feature.properties['Tipo:'])) {
+                case 'Academia ao ar livre':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(30,155,209,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Área de atividades físicas':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(32,225,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Área de lazer':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(97,200,145,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Área de lazer ':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(94,153,230,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Área de lazer comunitária':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,30,167,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Área de recreação':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(220,204,124,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Campo de futebol':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(157,118,219,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Campo de futebol de areia':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(140,127,240,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Campo de futebol society':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,74,208,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Campo de rugby':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(108,226,45,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Clube esportivo':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(122,205,139,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Complexo esportivo':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,56,96,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Espaço de lazer rural':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,146,118,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Parque esportivo':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(186,234,108,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Pista de bicicross':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(195,208,75,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Pista de skate':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(170,88,211,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Playground / espaço infantil':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(223,170,101,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Praça':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(236,20,17,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Praça com pista de skate':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,101,154,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Praça e campo de futebol':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(55,232,39,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Praça esportiva':
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(190,18,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(36,200,159,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7');
+        map.getPane('pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7').style.zIndex = 407;
+        map.getPane('pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7').style['mix-blend-mode'] = 'normal';
+        var layer_reasdeesporteelazernomunicpiodeRioGrandePgina1_7 = new L.geoJson(json_reasdeesporteelazernomunicpiodeRioGrandePgina1_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+            layerName: 'layer_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+            pane: 'pane_reasdeesporteelazernomunicpiodeRioGrandePgina1_7',
+            onEachFeature: pop_reasdeesporteelazernomunicpiodeRioGrandePgina1_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_reasdeesporteelazernomunicpiodeRioGrandePgina1_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_reasdeesporteelazernomunicpiodeRioGrandePgina1_7);
+        map.addLayer(layer_reasdeesporteelazernomunicpiodeRioGrandePgina1_7);
+        setBounds();
+        </script>        
+    </body>
+</html>
